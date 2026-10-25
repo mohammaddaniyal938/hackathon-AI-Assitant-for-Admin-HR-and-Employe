@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Hackathon Starter",
+  title: "HCM Lite ",
   description: "Next.js + Express Auth Starter",
 };
 

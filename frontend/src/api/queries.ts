@@ -24,6 +24,7 @@ export function useLogin() {
     onSuccess: (data) => {
       localStorage.setItem("accessToken", data.accessToken);
       localStorage.setItem("refreshToken", data.refreshToken);
+      window.dispatchEvent(new Event("hcm-auth-token-changed"));
       queryClient.setQueryData(authKeys.me, { user: data.user });
     },
   });
@@ -33,11 +34,12 @@ export function useRegister() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ email, password }: { email: string; password: string }) =>
-      authApi.register(email, password),
+    mutationFn: ({ email, password, role, firstName, lastName, employeeCode, department, designation }: { email: string; password: string; role?: "admin" | "hr" | "employee"; firstName?: string; lastName?: string; employeeCode?: string; department?: string; designation?: string }) =>
+      authApi.register(email, password, { role, firstName, lastName, employeeCode, department, designation }),
     onSuccess: (data) => {
       localStorage.setItem("accessToken", data.accessToken);
       localStorage.setItem("refreshToken", data.refreshToken);
+      window.dispatchEvent(new Event("hcm-auth-token-changed"));
       queryClient.setQueryData(authKeys.me, { user: data.user });
     },
   });
@@ -51,12 +53,14 @@ export function useLogout() {
     onSuccess: () => {
       localStorage.removeItem("accessToken");
       localStorage.removeItem("refreshToken");
+      window.dispatchEvent(new Event("hcm-auth-token-changed"));
       queryClient.setQueryData(authKeys.me, null);
       queryClient.clear();
     },
     onError: () => {
       localStorage.removeItem("accessToken");
       localStorage.removeItem("refreshToken");
+      window.dispatchEvent(new Event("hcm-auth-token-changed"));
       queryClient.setQueryData(authKeys.me, null);
       queryClient.clear();
     },

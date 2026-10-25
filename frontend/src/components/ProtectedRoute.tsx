@@ -1,20 +1,24 @@
 "use client";
 
 import { useAuth } from "@/context/AuthContext";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect } from "react";
+import FloatingChatButton from "@/components/assistant/FloatingChatButton";
 
 export default function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
   const router = useRouter();
+  const pathname = usePathname();
 
   useEffect(() => {
     if (!loading && !user) {
-      router.push("/login");
+      router.replace("/login");
+    } else if (!loading && user?.isTempPassword && pathname !== "/change-password") {
+      router.replace("/change-password");
     }
-  }, [user, loading, router]);
+  }, [user, loading, pathname, router]);
 
-  if (loading) {
+  if (loading || !user || (user.isTempPassword && pathname !== "/change-password")) {
     return (
       <div className="flex min-h-screen items-center justify-center">
         <p className="text-lg">Loading...</p>
@@ -22,7 +26,10 @@ export default function ProtectedRoute({ children }: { children: React.ReactNode
     );
   }
 
-  if (!user) return null;
-
-  return <>{children}</>;
+  return (
+    <>
+      {children}
+      {pathname !== "/change-password" && !user.isTempPassword && <FloatingChatButton />}
+    </>
+  );
 }

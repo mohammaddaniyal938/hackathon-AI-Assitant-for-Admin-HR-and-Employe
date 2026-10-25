@@ -3,6 +3,14 @@ import api from "@/lib/api";
 export interface User {
   id: string;
   email: string;
+  role?: "admin" | "hr" | "employee";
+  firstName?: string;
+  lastName?: string;
+  employeeCode?: string;
+  department?: string;
+  designation?: string;
+  status?: string;
+  isTempPassword?: boolean;
 }
 
 export interface AuthResponse {
@@ -19,8 +27,8 @@ export const authApi = {
   login: (email: string, password: string) =>
     api.post<AuthResponse>("/auth/login", { email, password }).then((r) => r.data),
 
-  register: (email: string, password: string) =>
-    api.post<AuthResponse>("/auth/register", { email, password }).then((r) => r.data),
+  register: (email: string, password: string, extra?: Partial<User>) =>
+    api.post<AuthResponse>("/auth/register", { email, password, ...extra }).then((r) => r.data),
 
   logout: () => api.post("/auth/logout").then((r) => r.data),
 
